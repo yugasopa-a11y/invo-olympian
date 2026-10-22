@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OLYMPIAN INVO RADAR | Precision Position &amp; TP/SL Oracle</title>
+  <meta name="description" content="Majestic white marble real-time trade tracker, position update oracle, TP/SL adjustment alert feed, and Telegram notifier for Invo.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Cinzel+Decorative:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="shell">
+    <!-- Topbar Navigation -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-icon">🏛️</div>
+        <div class="brand-title">
+          <h1>OLYMPIAN <span>RADAR</span></h1>
+          <small>Precision Position &amp; TP / SL Action Oracle · Web Edition</small>
+        </div>
+      </div>
+
+      <div class="topbar-controls">
+        <div class="beacon-pill" id="beaconPill">
+          <span class="pulse-dot"></span>
+          <span id="connectionStatus">ORACLE ARMED</span>
+        </div>
+        <button id="soundToggleBtn" class="btn btn-toggle active" title="Toggle audio chime alerts">
+          🔊 Sound: ON
+        </button>
+        <button id="notifToggleBtn" class="btn btn-toggle" title="Enable browser push notifications">
+          🔔 Desktop: OFF
+        </button>
+        <button id="testAlertBtn" class="btn" title="Simulate a live trader alert to verify audio and visuals">
+          ⚡ Test Alert
+        </button>
+        <button id="settingsBtn" class="btn" title="Configure Invo token, Telegram, and Discord webhooks">
+          ⚙️ Settings
+        </button>
+      </div>
+    </header>
+
+    <!-- Search Deck & Position Link Input -->
+    <section class="deck-section">
+      <div class="card">
+        <div class="search-bar">
+          <div class="search-input-wrap">
+            <span class="search-icon">🔍</span>
+            <input 
+              type="text" 
+              id="portfolioInput" 
+              class="search-input" 
+              placeholder="Paste Invo Position Link (e.g. 93fbfc.../investment/46f6dd...) or Portfolio ID..."
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+          <button id="loadPortfolioBtn" class="btn primary quick-pick-btn">
+            Track Position / Portfolio
+          </button>
+        </div>
+
+        <!-- Saved Watchlist Shelf (Persistent via LocalStorage) -->
+        <div class="watchlist-shelf" id="watchlistShelf">
+          <div class="watchlist-head">
+            <h4><span>⭐</span> My Saved Watchlist (<span id="watchlistCount">0</span>)</h4>
+            <span style="font-size: 11px; color: var(--ink-muted);">Saved in browser storage · Always active</span>
+          </div>
+          <div class="watchlist-chips" id="watchlistChips">
+            <span style="font-size: 12px; color: var(--ink-muted); font-style: italic;">No positions saved yet. Click "⭐ Pin to Watchlist" on any position to track it permanently.</span>
+          </div>
+        </div>
+
+        <!-- Followed Traders Carousel -->
+        <div class="followed-row" id="followedRow">
+          <span style="font-size: 11.5px; font-weight: 700; color: var(--gold); padding-right: 4px;">Followed Traders:</span>
+          <span style="font-size: 12px; color: var(--ink-muted); font-style: italic;">Loading followed traders...</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trader Dossier Card -->
+    <section id="dossierSection" class="card dossier-card" style="display: none;">
+      <div class="trader-avatar-lg" id="dossierAvatar">🏛️</div>
+      <div class="dossier-info">
+        <h2 id="dossierName">Trader Name <span id="dossierBadge" class="lev-tag">PORTFOLIO</span></h2>
+        <div class="dossier-meta">
+          <span id="dossierId">ID: --</span>
+          <span id="dossierFollowers">👥 -- followers</span>
+          <span id="dossierDesc" style="color: var(--ink-muted);"></span>
+        </div>
+      </div>
+      <div class="dossier-metrics">
+        <div class="dossier-metric">
+          <label>Open Trades</label>
+          <strong id="dossierOpenTrades">0</strong>
+        </div>
+        <div class="dossier-metric">
+          <label>Win Rate</label>
+          <strong id="dossierWinRate" style="color: var(--laurel-green);">--%</strong>
+        </div>
+        <div class="dossier-metric">
+          <label>Total Return</label>
+          <strong id="dossierReturn" style="color: var(--gold);">--%</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- Watched Position Cockpit (Olympian Oracle HUD) -->
+    <section id="watchedHud" class="watched-hud" style="display: none;">
+      <div class="hud-top">
+        <div class="hud-asset">
+          <span class="pulse-dot"></span>
+          <span class="hud-coin" id="hudCoin">BTC / USDT</span>
+          <span class="side-badge long" id="hudSideBadge">LONG</span>
+          <span class="lev-tag" id="hudLevTag">20x</span>
+          <span class="status-badge open" id="hudStatusBadge">ACTIVE POSITION</span>
+          <span id="hudTraderTag" style="font: 600 12px var(--font-mono); color: var(--ink-muted);">Trader: --</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <div class="hud-pnl-block">
+            <span style="font: 700 10px var(--font-sans); color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.06em;">Position PnL</span>
+            <div class="hud-pnl positive" id="hudPnl">+0.00%</div>
+          </div>
+          <button id="pinPositionBtn" class="btn" style="border-color: var(--gold); color: var(--gold);" title="Pin to permanent watchlist">
+            ⭐ Pin
+          </button>
+          <a id="hudInvoLink" href="#" target="_blank" class="btn" style="border-color: var(--border); color: var(--ink-secondary);" title="Open position directly on Invo">
+            Invo ↗
+          </a>
+          <button id="unwatchBtn" class="btn" style="border-color: var(--spartan-red-border); color: var(--spartan-red);">
+            Stop
+          </button>
+        </div>
+      </div>
+
+      <!-- TP / SL Visual Range Bar -->
+      <div class="tpsl-meter">
+        <div class="meter-track" id="meterTrack">
+          <div class="meter-fill" id="meterFill"></div>
+          <div class="meter-thumb" id="meterThumb" style="left: 50%;"></div>
+        </div>
+        <div class="meter-labels">
+          <div class="meter-label sl">
+            <small>STOP LOSS (SL)</small>
+            <strong id="hudSlPrice">Not Set</strong>
+            <span id="hudSlDiff" style="font-size: 11px; color: var(--spartan-red); font-weight: 700;">--</span>
+          </div>
+          <div class="meter-label entry">
+            <small>ENTRY PRICE</small>
+            <strong id="hudEntryPrice">$0.00</strong>
+            <span id="hudMarkPrice" style="font-size: 11px; color: var(--ink-secondary); font-weight: 700;">Mark: $0.00</span>
+          </div>
+          <div class="meter-label tp">
+            <small>TAKE PROFIT (TP)</small>
+            <strong id="hudTpPrice">Not Set</strong>
+            <span id="hudTpDiff" style="font-size: 11px; color: var(--laurel-green); font-weight: 700;">--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- HUD Bottom Stats -->
+      <div class="hud-stats-grid">
+        <div class="hud-stat">
+          <label>Position Size / Margin</label>
+          <strong id="hudMargin">--%</strong>
+        </div>
+        <div class="hud-stat">
+          <label>Entry Timestamp</label>
+          <strong id="hudOpenedAt">--</strong>
+        </div>
+        <div class="hud-stat">
+          <label>Last Action Detected</label>
+          <strong id="hudLastAction" style="color: var(--gold);">Monitoring position moves...</strong>
+        </div>
+        <div class="hud-stat">
+          <label>Oracle Alert Status</label>
+          <strong id="hudWatcherStatus" style="color: var(--laurel-green);">ARMED (LIVE BROWSER FEED)</strong>
+        </div>
+      </div>
+
+      <!-- Watched Trade Update History Timeline Deck -->
+      <div id="hudHistoryDeck" style="margin-top: 18px; border-top: 1px solid var(--border-subtle); padding-top: 14px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+          <h4 style="font-family: var(--font-serif); font-size: 13.5px; font-weight: 800; color: var(--ink-primary); letter-spacing: 0.04em;">
+            📜 Position Update History &amp; Actions (<span id="hudHistoryCount">0</span>)
+          </h4>
+          <span style="font: 600 11px var(--font-mono); color: var(--ink-muted);" id="hudInvestmentIdTag"></span>
+        </div>
+        <div id="hudHistoryList" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto;">
+          <div style="font-size: 12px; color: var(--ink-muted); font-style: italic; padding: 6px 0;">
+            No updates recorded yet. Any TP, SL, size changes or exits will be cataloged here in real time.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Two-Column Layout -->
+    <div class="main-layout">
+      <!-- Left Column: Active Trades Deck -->
+      <section class="card">
+        <div class="trades-deck-head">
+          <h3>
+            <span>📊</span> Available Positions (<span id="openTradesCount">0</span>)
+          </h3>
+          <button id="refreshTradesBtn" class="btn" style="padding: 5px 11px; font-size: 11.5px;">
+            ↻ Refresh
+          </button>
+        </div>
+
+        <div class="trades-list" id="tradesList">
+          <div class="feed-empty">
+            Paste a position link or portfolio ID above to track investments.
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Live Feed ("feed type shit thing") -->
+      <section class="card">
+        <div class="feed-head">
+          <h3>
+            <span>⚡</span> Real-Time Action Feed (<span id="feedCount">0</span>)
+          </h3>
+          <div class="feed-filters">
+            <button class="feed-filter-btn active" data-filter="all">All Alerts</button>
+            <button class="feed-filter-btn" data-filter="tpsl">🎯 TP / SL</button>
+            <button class="feed-filter-btn" data-filter="size">🔼 Scale / Trim</button>
+            <button class="feed-filter-btn" data-filter="close">🏁 Closures</button>
+            <button id="clearFeedBtn" class="btn" style="padding: 4px 9px; font-size: 11px; margin-left: 6px;">Clear</button>
+          </div>
+        </div>
+
+        <div class="feed-container" id="feedContainer">
+          <div class="feed-empty" id="feedEmptyState">
+            No events detected yet. When the trader changes TP/SL, scales in/out, or closes, it streams here instantly.
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Settings / Config Modal -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>🏛️ Oracle &amp; Alert Configuration</h3>
+        <button class="modal-close" id="modalCloseBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="cfgRefreshToken">Invo Refresh Token</label>
+          <input 
+            type="password" 
+            id="cfgRefreshToken" 
+            class="form-control" 
+            placeholder="Pre-loaded Invo Refresh Token"
+          />
+          <div class="form-hint" id="tokenHint">
+            Hardcoded for your account. Automatically refreshes access tokens.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="cfgCorsProxy">CORS Proxy Mode (for GitHub Pages)</label>
+          <select id="cfgCorsProxy" class="form-control">
+            <option value="auto" selected>Auto Fallback (Direct ➔ corsproxy.io) - Recommended</option>
+            <option value="corsproxy">Force CorsProxy.io (Fast &amp; reliable for GitHub Pages)</option>
+            <option value="allorigins">Force AllOrigins.win</option>
+            <option value="direct">Direct (No proxy / Local dev)</option>
+          </select>
+          <div class="form-hint">Allows GitHub Pages browser requests to reach Invo API without CORS blocks.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="cfgPollInterval">Radar Scan Frequency</label>
+          <select id="cfgPollInterval" class="form-control">
+            <option value="2000">Fast (2 seconds) - Ultra responsive</option>
+            <option value="3500" selected>Balanced (3.5 seconds) - Recommended</option>
+            <option value="5000">Standard (5 seconds)</option>
+            <option value="10000">Relaxed (10 seconds)</option>
+          </select>
+          <div class="form-hint">Time between Invo snapshot deep-diff scans.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="cfgDiscordWebhook">Discord Webhook (Phone / Server Alerts)</label>
+          <div style="display: flex; gap: 8px;">
+            <input 
+              type="text" 
+              id="cfgDiscordWebhook" 
+              class="form-control" 
+              placeholder="https://discord.com/api/webhooks/..."
+            />
+            <button id="testDiscordBtn" class="btn" style="white-space: nowrap;">Test Discord</button>
+          </div>
+          <div class="form-hint">Instant mobile notifications whenever TP, SL, size changes occur.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="cfgTelegramToken">Telegram Bot Token (Phone Notifications)</label>
+          <input 
+            type="text" 
+            id="cfgTelegramToken" 
+            class="form-control" 
+            placeholder="123456789:ABCdefGhIJKlmNoP..."
+          />
+          <div class="form-hint">Create a bot on Telegram via @BotFather to get your token.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="cfgTelegramChatId">Telegram Chat ID</label>
+          <div style="display: flex; gap: 8px;">
+            <input 
+              type="text" 
+              id="cfgTelegramChatId" 
+              class="form-control" 
+              placeholder="e.g. 987654321 or @yourchannel"
+            />
+            <button id="testTelegramBtn" class="btn" style="white-space: nowrap;">Test Telegram</button>
+          </div>
+          <div class="form-hint">Your numeric Telegram user/chat ID (message @userinfobot to find it).</div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button id="cancelSettingsBtn" class="btn">Cancel</button>
+        <button id="saveSettingsBtn" class="btn primary">Save &amp; Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio Alert Synthesizer -->
+  <script src="audio.js"></script>
+  <!-- Client Application Controller -->
+  <script src="app.js"></script>
+</body>
+</html>
