@@ -1,0 +1,20 @@
+{
+  "invoRefreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDA4ZjFkM2MtOGYxYi00YTEyLThkYTktYzcxNzRhOTE1NWFlIiwiZXhwaXJlcyI6MTgyMTY0ODExMC4yMjA4MDI4LCJkZXZpY2VfaWQiOiIxYTlhZjkzMC1mMTFhLTQyMmItOGZkNy05OTViMDc1OGYwZmYiLCJ0cmFkaW5nX2FjY291bnQiOnsiaWQiOiIyYjBkZWI2ZS04MDY2LTQwMjYtYTRiMC01ZjU3ZDJiNTA1ZjkiLCJwcm92aWRlciI6InR1cm5rZXkiLCJvcmdhbml6YXRpb25faWQiOiJhYTJkZmZkMi1kZDQxLTQ1NjMtYTEyZi02YTA0OWQxZjcyOWMiLCJ3YWxsZXRfYWRkcmVzcyI6IjB4RTM5YmM2MTlDOWQ5MjVBMzBiYzY3OTFDREFGMDlDN2UxQWRhRDdiNyIsInByaW1hcnkiOnRydWUsIndhbGxldCI6eyJldm1fYWRkcmVzcyI6IjB4RTM5YmM2MTlDOWQ5MjVBMzBiYzY3OTFDREFGMDlDN2UxQWRhRDdiNyIsInN2bV9hZGRyZXNzIjoiOTczU1VpaDFZTndVajdidXp5aUx1VDJ4NUxVU2ZVQjR4dnV6ejZIajNCWDQifX0sInJlZnJlc2hhYmxlIjp0cnVlfQ.n0CrSgLQvLFrM39DUxfRQXtmwV8IL-a2ZDqu5cvyO58",
+  "pollIntervalMs": 3000,
+  "soundEnabled": true,
+  "desktopNotifications": true,
+  "discordWebhook": "",
+  "telegramBotToken": "",
+  "telegramChatId": "",
+  "watchedTrades": {
+    "46f6ddc1-961c-4a09-a5fe-6ff81b72c2a4": {
+      "baseId": "46f6ddc1-961c-4a09-a5fe-6ff81b72c2a4",
+      "portfolioId": "93fbfc8fdc0946b1a86aa1018ff6c9a3",
+      "coin": "LTC",
+      "side": "LONG",
+      "addedAt": "2026-10-22T19:08:41.121Z"
+    }
+  },
+  "watchedPortfolios": {},
+  "lastActivePortfolioId": "bd82cc0f6ec1464eab389e40f0b106c1"
+}

@@ -1,0 +1,13 @@
+{
+  "name": "invo-trade-watcher",
+  "version": "1.0.0",
+  "description": "Real-time Invo trader position watcher, live activity feed, and instant TP/SL/size/close alerts",
+  "main": "server.mjs",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "keywords": ["invo", "copy-trading", "alerts", "take-profit", "stop-loss", "feed", "radar"],
+  "author": "Invo Phantom",
+  "license": "MIT"
+}

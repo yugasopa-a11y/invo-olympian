@@ -1,0 +1,22 @@
+[
+  {
+    "id": "8c185078-bbc6-47c5-b849-46e4db7e2083",
+    "timestamp": "2026-10-22T19:39:11.655Z",
+    "type": "TRADE_CLOSED",
+    "severity": "danger",
+    "badge": "🏁 TRADE CLOSED",
+    "title": "Trade Closed · LTC LONG",
+    "message": "@davidne fully closed LTC LONG (4x). Final return: -3.8%",
+    "coin": "LTC",
+    "side": "LONG",
+    "trader": "davidne",
+    "portfolioTitle": "✖️Scalps ✖️",
+    "baseId": "46f6ddc1-961c-4a09-a5fe-6ff81b72c2a4",
+    "diff": {
+      "field": "status",
+      "old": "OPEN",
+      "new": "CLOSED"
+    },
+    "sound": "close_triumph"
+  }
+]

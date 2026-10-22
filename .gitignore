@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+
+# Local database / logs
+*.log
+sentinel.db
+alerts.json
+
+# OS files
+.DS_Store
+Thumbs.db
